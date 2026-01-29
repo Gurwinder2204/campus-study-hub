@@ -1,10 +1,12 @@
 # 🎓 Campus Study Hub
 
-A modern, full-stack web application for managing and sharing educational resources for Computer Science students. Built with Spring Boot, Thymeleaf, and MySQL.
+A modern, full-stack web application for managing and sharing educational resources for Computer Science students. Built with Spring Boot, Thymeleaf, and PostgreSQL.
+
+> 📝 **Note**: Originally developed with MySQL, later migrated to PostgreSQL for cloud deployment on Render.
 
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.2-brightgreen)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## ✨ Features
@@ -24,16 +26,17 @@ A modern, full-stack web application for managing and sharing educational resour
 |-------|------------|
 | Backend | Spring Boot 3.2.2, Spring Security, Spring Data JPA |
 | Frontend | Thymeleaf, Bootstrap 5, Bootstrap Icons |
-| Database | MySQL 8.0 |
+| Database | PostgreSQL (Render) |
 | Build Tool | Maven |
 | Java Version | Java 17 |
+| Deployment | Render |
 
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
 - **Java 17** or higher ([Download](https://adoptium.net/))
-- **MySQL 8.0** ([Download](https://dev.mysql.com/downloads/mysql/))
+- **PostgreSQL 14+** ([Download](https://www.postgresql.org/download/))
 - **Maven 3.6+** (optional - wrapper included)
 - **Git** (for cloning)
 
@@ -42,13 +45,13 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/campus-study-hub.git
+git clone https://github.com/Gurwinder2204/campus-study-hub.git
 cd campus-study-hub
 ```
 
 ### 2. Configure Database
 
-Create a MySQL database (or let the app create it automatically):
+Create a PostgreSQL database:
 
 ```sql
 CREATE DATABASE campus_study_hub;
@@ -65,9 +68,10 @@ cp src/main/resources/application-example.properties src/main/resources/applicat
 Edit `application.properties` with your credentials:
 
 ```properties
-# Database Configuration
-spring.datasource.username=YOUR_MYSQL_USERNAME
-spring.datasource.password=YOUR_MYSQL_PASSWORD
+# Database Configuration (PostgreSQL)
+spring.datasource.url=jdbc:postgresql://localhost:5432/campus_study_hub
+spring.datasource.username=YOUR_POSTGRES_USERNAME
+spring.datasource.password=YOUR_POSTGRES_PASSWORD
 
 # Admin User Configuration (CHANGE BEFORE FIRST RUN!)
 app.admin.email=admin@campus.com
@@ -129,6 +133,7 @@ campus-study-hub/
 │   ├── application.properties        # (not committed)
 │   └── application-example.properties # Template config
 ├── uploads/             # Uploaded files directory
+├── Dockerfile           # Production Docker config
 └── pom.xml              # Maven dependencies
 ```
 
@@ -148,14 +153,33 @@ campus-study-hub/
 
 1. **Never commit credentials** - `application.properties` is in `.gitignore`
 2. **Change default passwords** - Update admin password before first run
-3. **Use environment variables** - For production, use environment variables:
+3. **Use environment variables** - For production/Render deployment:
 
    ```properties
+   spring.datasource.url=${DB_URL}
+   spring.datasource.username=${DB_USERNAME}
    spring.datasource.password=${DB_PASSWORD}
-   app.admin.password=${ADMIN_PASSWORD}
+   app.admin.password=${APP_ADMIN_PASSWORD}
    ```
 
 4. **Passwords are hashed** - All passwords are stored using BCrypt
+
+## 🚀 Render Deployment
+
+This project is configured for deployment on Render with PostgreSQL:
+
+1. Create a new **Web Service** on Render
+2. Connect your GitHub repository
+3. Set build command: `./mvnw clean package -DskipTests`
+4. Set start command: `java -jar target/campus-study-hub-1.0.0.jar`
+5. Add a **PostgreSQL** database on Render
+6. Set environment variables:
+   - `DB_URL` - PostgreSQL connection URL from Render
+   - `DB_USERNAME` - Database username
+   - `DB_PASSWORD` - Database password
+   - `APP_ADMIN_EMAIL` - Admin email
+   - `APP_ADMIN_PASSWORD` - Admin password
+   - `APP_ADMIN_NAME` - Admin display name
 
 ## 🧪 Running Tests
 
@@ -195,7 +219,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 👨‍💻 Author
 
-Created as a learning project showcasing Spring Boot, Thymeleaf, and MySQL integration.
+Created as a learning project showcasing Spring Boot, Thymeleaf, and PostgreSQL integration.
 
 ---
 
