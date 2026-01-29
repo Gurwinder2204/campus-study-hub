@@ -11,13 +11,16 @@ import com.campusstudyhub.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Data loader to seed initial data on application startup.
+ * 
+ * Uses ApplicationReadyEvent to ensure schema is created before seeding.
  * 
  * Admin credentials are configured via application.properties:
  * - app.admin.email: Admin email address (default: admin@campus.com)
@@ -26,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @ConditionalOnProperty(name = "app.dataloader.enabled", havingValue = "true", matchIfMissing = true)
-public class DataLoader implements CommandLineRunner {
+public class DataLoader {
 
     private static final Logger log = LoggerFactory.getLogger(DataLoader.class);
 
@@ -55,15 +58,20 @@ public class DataLoader implements CommandLineRunner {
         this.userService = userService;
     }
 
-    @Override
+    /**
+     * Runs after the application is fully ready (schema created, beans
+     * initialized).
+     * This ensures Hibernate has created all tables before we try to access them.
+     */
+    @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    public void run(String... args) {
-        log.info("Starting data seeding...");
+    public void onApplicationReady() {
+        log.info("Starting data seeding (ApplicationReadyEvent)...");
 
         // Create admin user using configured credentials
         createAdmin();
 
-        // Create semesters and subjects
+        // Create semesters and subjects only if not already present
         if (semesterRepository.count() == 0) {
             seedSemesters();
             log.info("Semesters and subjects seeded successfully!");
