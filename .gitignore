@@ -69,9 +69,7 @@ coverage/
 *~.nib
 local.properties
 
-# Sensitive configuration - DO NOT COMMIT
-src/main/resources/application.properties
-
 # Debug output files
 debug-output.txt
 spring-run.txt
+
